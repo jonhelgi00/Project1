@@ -37,10 +37,32 @@ def part2_2a():
 
 # Load the image
 img = cv2.imread('/Users/jonhelgi/KTH_projects/Analysis_Search/Project1/obj1_5.JPG')
+
+#add padding to avoid cut-off
+old_height, old_width, channels = img.shape
+
+new_width = int(np.ceil(np.sqrt(old_height**2 + old_width**2)))
+color = (0,0,0)
+result = np.full((new_width, new_width, channels), color, dtype=np.uint8)
+
+x_center = (new_width - old_width) // 2
+y_center = (new_width - old_height) // 2
+
+# copy img image into center of result image
+result[y_center:y_center+old_height, 
+       x_center:x_center+old_width] = img
+
+# view result
+cv2.imshow("result", result)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+#grayscale
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Get the center of the image
-height, width = img.shape[:2]
+height, width = gray.shape[:2]
 # center = (width // 2, height // 2) #floored
 center = (width / 2, height / 2)
 sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.18, edgeThreshold = 100) 
@@ -65,17 +87,9 @@ for angle in angle_list:
     og_coord = np.array([[kp_og[200].pt[0],
                          kp_og[200].pt[1]]])
     rotation_matrix = np.array(rotation_matrix) #transform to np array
-    # print(rotation_matrix[:,:2].shape)
-    # print(rotation_matrix[:,-1].shape)
-    # print(og_coord.T.shape)
     # kp_new = rotation_matrix[:,:2] @ og_coord.T + rotation_matrix[:,-1]
     kp_new = rotation_matrix[:,:2] @ og_coord.T + np.reshape(rotation_matrix[:,-1],(2,1))
     kp_new = np.reshape(kp_new, (2,))
-    print(kp_og[200].pt)
-    print(og_coord)
-    print(kp_new)
-    print(round(kp_og[200].pt[1]))
-    print(round(kp_new[1]))
     # print((rotation_matrix[:,:2] @ og_coord.T).shape)
     # center = np.array(center)
     x_rotated = (og_coord[0,0] - center[0]) * np.cos(angle * np.pi/180) - (og_coord[0,1] - center[1]) * np.sin(angle * np.pi/180) + center[0]
@@ -83,15 +97,24 @@ for angle in angle_list:
 
     # cv2.circle(rotated_image,((round(kp_new[0]),round(kp_new[1]))), 30, (250,0,0), -1)
     # cv2.circle(rotated_image,(round(kp_og[200].pt[0]),round(kp_og[200].pt[0])), 30, (250,0,0), -1)
-    cv2.circle(rotated_image,(round(kp_og[200].pt[0]),round(kp_og[200].pt[1])), 30, (250,0,0), -1)
-    # cv2.circle(rotated_image,(round(x_rotated), round(y_rotated)), 30, (250,0,0), -1)
-    cv2.imshow('Rotated Image', rotated_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.circle(rotated_image,(round(kp_og[200].pt[0]),round(kp_og[200].pt[1])), 30, (250,0,0), -1)
+    # # cv2.circle(rotated_image,(round(x_rotated), round(y_rotated)), 30, (250,0,0), -1)
+    # cv2.imshow('Rotated Image', rotated_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
   
   kp = sift.detect(rotated_image,None)
   img_kp = cv2.drawKeypoints(rotated_image, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
+def scalebla():
+  img = cv2.imread('/Users/jonhelgi/KTH_projects/Analysis_Search/Project1/obj1_5.JPG')
+  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  img_scaled = cv2.resize(gray, None, fx = 2, fy = 2, interpolation=cv2.INTER_CUBIC)
+  cv2.imshow('Scaled', img_scaled)
+  cv2.waitKey(0)
+  cv2.destroyAllWindows()
+
+# scalebla()
 
 
 
