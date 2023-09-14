@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 #######
 2.2
@@ -105,7 +106,27 @@ for angle in angle_list:
   repeat_list.append((angle, repeatability))  
   
 
-print(repeat_list)
+# print(repeat_list)
+repeat_list = np.array(repeat_list)
+
+#Plot repeatability
+plt.figure(figsize=(8, 6))  # Adjust the figure size as needed.
+# Plot the data.
+plt.plot(repeat_list[:,0], repeat_list[:,1], label='rep', color='blue', linestyle='-')
+# Add a title.
+plt.title('Repeatability vs Rotation for SIFT')
+# Customize x and y labels.
+plt.xlabel('Rotation Angle (degrees)')
+plt.ylabel('Repeatability')
+# Customize xticks (here, I'm setting custom ticks at specific positions).
+custom_xticks = [0,45,90,135, 180, 225, 270, 315]  # Replace with your custom xticks.
+plt.xticks(custom_xticks)
+# Add a legend if multiple lines are plotted.
+# plt.legend()
+# Show the plot.
+plt.show()
+
+
 
 def scalebla():
   img = cv2.imread('/Users/jonhelgi/KTH_projects/Analysis_Search/Project1/obj1_5.JPG')
