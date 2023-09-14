@@ -27,7 +27,7 @@ def part2_2a():
   img2_ = cv2.drawKeypoints(gray, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
   # display the image with keypoints drawn on it
-  cv2.imwrite('KTH_SIFT_size_orient_500kp.jpg', img2_)
+  # cv2.imwrite('KTH_SIFT_size_orient_500kp.jpg', img2_)
   cv2.imshow("Keypoints", img2_)
   cv2.waitKey(0)
   cv2.destroyAllWindows()
@@ -52,14 +52,10 @@ y_center = (new_width - old_height) // 2
 result[y_center:y_center+old_height, 
        x_center:x_center+old_width] = img
 
-# view result
-cv2.imshow("result", result)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
+img_ = result
 
 #grayscale
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+gray = cv2.cvtColor(img_, cv2.COLOR_BGR2GRAY)
 
 # Get the center of the image
 height, width = gray.shape[:2]
@@ -67,44 +63,49 @@ height, width = gray.shape[:2]
 center = (width / 2, height / 2)
 sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.18, edgeThreshold = 100) 
 kp_og = sift.detect(gray,None)
+N_kp = len(kp_og)
+img2_ = cv2.drawKeypoints(gray, kp_og, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 # print(type(kp_og[0].pt[0]))
 # cv2.circle(gray,(round(kp_og[200].pt[0]),round(kp_og[200].pt[1])), 30, (250,0,0), -1)
-# cv2.imshow('Rotated Image', gray)
+# cv2.imwrite('KTH_SIFT_padding_528kp.jpg', img2_)
+# cv2.imshow('Keypoints in OG image (padded)', img2_)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
 # Define the rotation angle (in degrees)
 angle_list = np.arange(stop=360, step=15) # 0-345 degrees
+match_counter = 0
+repeat_list = []
 
 for angle in angle_list:
-    
   # Calculate the rotation matrix
+  match_counter = 0
   rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
   # Apply the rotation to the image
   rotated_image = cv2.warpAffine(gray, rotation_matrix, (width, height), flags=cv2.INTER_CUBIC)
-  if angle == 0:
-    og_coord = np.array([[kp_og[200].pt[0],
-                         kp_og[200].pt[1]]])
+  kp_rotated = sift.detect(rotated_image,None) #detect keypoints
+  kp_ideal = []
+  for kp in kp_og:
+    og_coord = np.array([[kp.pt[0],
+                         kp.pt[1]]])
     rotation_matrix = np.array(rotation_matrix) #transform to np array
     # kp_new = rotation_matrix[:,:2] @ og_coord.T + rotation_matrix[:,-1]
     kp_new = rotation_matrix[:,:2] @ og_coord.T + np.reshape(rotation_matrix[:,-1],(2,1))
     kp_new = np.reshape(kp_new, (2,))
-    # print((rotation_matrix[:,:2] @ og_coord.T).shape)
-    # center = np.array(center)
-    x_rotated = (og_coord[0,0] - center[0]) * np.cos(angle * np.pi/180) - (og_coord[0,1] - center[1]) * np.sin(angle * np.pi/180) + center[0]
-    y_rotated = (og_coord[0,0] - center[0]) * np.sin(angle * np.pi/180) + (og_coord[0,1] - center[1]) * np.cos(angle * np.pi/180) + center[1]
-
-    # cv2.circle(rotated_image,((round(kp_new[0]),round(kp_new[1]))), 30, (250,0,0), -1)
-    # cv2.circle(rotated_image,(round(kp_og[200].pt[0]),round(kp_og[200].pt[0])), 30, (250,0,0), -1)
-    # cv2.circle(rotated_image,(round(kp_og[200].pt[0]),round(kp_og[200].pt[1])), 30, (250,0,0), -1)
-    # # cv2.circle(rotated_image,(round(x_rotated), round(y_rotated)), 30, (250,0,0), -1)
-    # cv2.imshow('Rotated Image', rotated_image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    kp_ideal.append(kp_new)
+    found = False
+    for kp_rot in kp_rotated:
+      rot_coord = kp_rot.pt
+      rot_coord = np.array(rot_coord)
+      if np.linalg.norm(kp_new - rot_coord) < 2 and not found:
+        match_counter += 1
+        found = True
+  repeatability = match_counter / N_kp
+  repeat_list.append((angle, repeatability))  
   
-  kp = sift.detect(rotated_image,None)
-  img_kp = cv2.drawKeypoints(rotated_image, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+print(repeat_list)
 
 def scalebla():
   img = cv2.imread('/Users/jonhelgi/KTH_projects/Analysis_Search/Project1/obj1_5.JPG')
