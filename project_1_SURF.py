@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 #img2 = cv2.drawKeypoints(gray, kp_og, img, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 # Define the scaling factors
-SF = [1.2] * 3 # create a list of nine 1.2
-power = np.arange(3) # create list of power from 0 to 8
+SF = [1.2] * 9 # create a list of nine 1.2
+power = np.arange(9) # create list of power from 0 to 8
 SF_list = np.power(SF, power)
 
 def SURF_scaling():    
@@ -100,8 +100,8 @@ def SIFT_scaling():
     print(f"Number of keypoints for SIFT is: {len(kp_og)}")
 
     # Define the scaling factors
-    SF = [1.2] * 3 # create a list of nine 1.2
-    power = np.arange(3) # create list of power from 0 to 8
+    SF = [1.2] * 9 # create a list of nine 1.2
+    power = np.arange(9) # create list of power from 0 to 8
     SF_list = np.power(SF, power)
     match_counter = 0
     repeat_list = []
