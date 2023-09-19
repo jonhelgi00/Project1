@@ -75,9 +75,11 @@ img2_ = cv2.drawKeypoints(gray, kp_og, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_R
 # cv2.destroyAllWindows()
 
 # Define the rotation angle (in degrees)
-angle_list = np.arange(stop=360, step=15) # 0-345 degrees
+# angle_list = np.arange(stop=360, step=15) # 0-345 degrees
+angle_list = np.arange(stop=375, step=15) # 0-345 degrees
 match_counter = 0
 repeat_list = []
+print(angle_list)
 
 for angle in angle_list:
   # Calculate the rotation matrix
@@ -137,7 +139,7 @@ def SURF_rotation():
   height, width = gray.shape[:2]
   # center = (width // 2, height // 2) #floored
   center = (width / 2, height / 2)
-  surf = cv2.xfeatures2d.SURF_create(5000) 
+  surf = cv2.xfeatures2d.SURF_create(6000) 
   kp_og = surf.detect(gray,None)
   N_kp = len(kp_og)
   img2_ = cv2.drawKeypoints(gray, kp_og, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -150,7 +152,7 @@ def SURF_rotation():
   # cv2.destroyAllWindows()
 
   # Define the rotation angle (in degrees)
-  angle_list = np.arange(stop=360, step=15) # 0-345 degrees
+  angle_list = np.arange(stop=375, step=15) # 0-345 degrees
   match_counter = 0
   repeat_list = []
 
@@ -198,7 +200,7 @@ plt.title('Repeatability vs Rotation for SIFT & SURF')
 plt.xlabel('Rotation Angle (degrees)')
 plt.ylabel('Repeatability')
 # Customize xticks (here, I'm setting custom ticks at specific positions).
-custom_xticks = [0,45,90,135, 180, 225, 270, 315]  # Replace with your custom xticks.
+custom_xticks = [0,45,90,135, 180, 225, 270, 315, 360]  # Replace with your custom xticks.
 plt.xticks(custom_xticks)
 # Add a legend if multiple lines are plotted.
 plt.legend()
